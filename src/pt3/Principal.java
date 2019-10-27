@@ -1,43 +1,28 @@
 package pt3;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JScrollPane;
 
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
-import java.awt.event.ActionEvent;
-import javax.swing.border.CompoundBorder;
-import javax.swing.LayoutStyle.ComponentPlacement;
-
-public class Principal extends JFrame  {
+public class Principal extends JFrame {
 
 	private JPanel contentPane;
 	private JTable table;
-	public DatosCiudades intercambioDatos;
-	private DefaultTableModel dtm;
-	private VentanaPreguntas vp ;
+	DatosCiudades datos;
+	DefaultTableModel dtm;
+
 	/**
 	 * Launch the application.
 	 */
@@ -59,12 +44,14 @@ public class Principal extends JFrame  {
 	 */
 	public Principal() {
 		
-		intercambioDatos = new DatosCiudades();
+		datos = new DatosCiudades();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 688, 391);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
+		
+		JScrollPane scrollPane = new JScrollPane();
 		
 		table = new JTable();
 		table.setColumnSelectionAllowed(true);
@@ -72,142 +59,53 @@ public class Principal extends JFrame  {
 		table.setBorder(new CompoundBorder());
 		//Para poder seleccionar
         table.setCellSelectionEnabled(true);
-		// Column Names 
-        String[] nombreColumnas = { "Nombre", "Comarca", "Num hab","Metros Cuadrados" };
-        dtm = new DefaultTableModel(nombreColumnas,0);
         
-        //ListSelectionModel contendrá las filas seleccionadas
-        ListSelectionModel select= table.getSelectionModel();  
-        //solo podremos seleccionar una fila
-        select.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        //Añadimos un listener para actuar cuando se selecciona
-        select.addListSelectionListener(new ListSelectionListener() {  
-        	//Es llamado cuando cambia la selección
-          public void valueChanged(ListSelectionEvent e) {  
-            String Data = null;  
-            int[] row = table.getSelectedRows();  
-            int[] columns = table.getSelectedColumns();  
-            for (int i = 0; i < row.length; i++) {  
-            	System.out.println("La fila es "+i+" y tiene "+columns.length);
-              for (int j = 0; j < columns.length; j++) {  
-                Data = (String) table.getValueAt(row[i], columns[j]);  
-                System.out.println("Table element selected is: " + Data);  
-              } }  
-              
-          }       
-        });  
-        
-        Vector<String> v = new Vector<String>();
-        v.add("bcn");
-        v.add("cataluña");
-        v.add("1000");
-        v.add("2000");
-        dtm.addRow(v);
-		table.setModel(dtm);
-		
-		 v = new Vector<String>();
-        v.add("mad");
-        v.add("Madrid");
-        v.add("1000");
-        v.add("2000");
-        dtm.addRow(v);
-		table.setModel(dtm);
-		
-		v = new Vector<String>();
-        v.add("VAL");
-        v.add("Comunidad valenciana");
-        v.add("1000");
-        v.add("2000");
-        dtm.addRow(v);
-		table.setModel(dtm);
-		
-				
-		JScrollPane sp = new JScrollPane(table); 
-		
-		
-		JButton btnNueva = new JButton("NUEVA");
-		//btnNueva.addActionListener(this);
-		btnNueva.addActionListener( new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				vp.setVisible(true);
-			}
+		String columnas[]= {"Nombre","Comarca","Num. hab","M2"};
+		dtm = new DefaultTableModel(columnas,0);
+		// Contiene las filas seleccionadas
+		ListSelectionModel model=table.getSelectionModel();
+		// Define el numero de lineas a seleccionar
+		model.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		// Listener para cuando sea seleccionado
+		model.addListSelectionListener(new ListSelectionListener() {
 			
-		});
-		
-		JButton btnEliminar = new JButton("Eliminar");
-		btnEliminar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				int[] row = table.getSelectedRows(); 
-				System.out.println("Numero de filas seleccionadas: "+row.length);
-				for(int i=row.length-1;i>=0;i--) {
-					dtm.removeRow(row[i]);
+			// Se llama cuando un valor es seleccionado
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				String dato = null;
+				int[]fila = table.getSelectedRows();
+				int[]columna = table.getSelectedColumns();
+				for (int i=0;i<fila.length;i++) {
+					System.out.println("Fila "+i+" tiene "+columna.length);
+					for(int j=0;j<columna.length;j++) {
+						dato = (String)table.getValueAt(fila[i], columna[j]);
+						System.out.println("Elemento seleccionado "+dato);
+					}
 				}
-				/*int sel=table.getSelectedRow();
-				dtm.removeRow(sel);*/
 			}
 		});
-		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(sp, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(btnNueva)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnEliminar)
-					.addGap(260))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(108)
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(54)
+							.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(552, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(sp, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnNueva)
-						.addComponent(btnEliminar))
-					.addContainerGap(55, Short.MAX_VALUE))
+					.addGap(41)
+					.addComponent(table, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
+					.addGap(35)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(263, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
-		
-		//Añado un listener a VentanaPreguntas para hacer algo cuando se cierre esta ventana
-		vp = new VentanaPreguntas(this, "Introduzca datos de la ciudad...");
-		//Si el Jdialog lo cierro con dispose.
-		vp.addWindowListener( new WindowAdapter() {
-			    @Override
-		        public void windowClosed(WindowEvent e) {
-		            System.out.println("Cierre de ventana");
-		            intercambioDatos=vp.devolverDatos();
-		            System.out.println("Nombre="+intercambioDatos.nombre);
-		            //Añadimos la ciudad a la tabla
-		            anadirCiudad();
-		        }
-		});
-		
-		
-		//esta opcion se activa con vp.setVisible(flase);
-		/*vp.addWindowListener( new WindowAdapter() {
-	        public void windowDeactivated(WindowEvent e) {
-		    	if( !vp.isVisible()) {
-		    		System.out.println("ventana desactivada e invisible");
-		    		intercambioDatos=vp.devolverDatos();
-		            System.out.println("Nombre="+intercambioDatos.nombre);
-		    	}
-		    }
-	    });*/
-		
-	}
-
-	
-	private void anadirCiudad() {
-		//datos están en intercambioDatos
-		Vector<String> v = new Vector<String>();
-		
-        v.add(intercambioDatos.nombre);
-        v.add(intercambioDatos.comarca);
-        v.add(String.valueOf(intercambioDatos.habitantes));
-        v.add( String.valueOf(intercambioDatos.metro2));
-        dtm.addRow(v);
 	}
 }
-
